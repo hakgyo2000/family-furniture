@@ -301,7 +301,7 @@ const BUILD={
  cabinet(g,w,d,h,c){B(g,w,h-.05,d,c,0,.05,0);B(g,w-.04,.05,d-.04,shade(c,.5),0,0,0);B(g,.006,h-.12,.006,shade(c,.7),0,.08,d/2+.003);
    B(g,.02,.15,.02,'#8e8e8e',-.05,h*.55,d/2+.01);B(g,.02,.15,.02,'#8e8e8e',.05,h*.55,d/2+.01)},
  tv(g,w,d,h,c){const y=.75;B(g,w,h,.05,'#111317',0,y,-d/2+.06,{roughness:.3});B(g,w-.03,h-.03,.003,'#1d2733',0,y+.015,-d/2+.087,{roughness:.2,metalness:.3})},
- rug(g,w,d,h,c){const m=B(g,w,.012,d,c,0,0,0);m.castShadow=false;const i=B(g,w-.24,.014,d-.24,shade(c,1.12),0,0,0);i.castShadow=false},
+ rug(g,w,d,h,c){const y=.024,b=Math.min(.12,Math.min(w,d)*.08);const m=B(g,w,.012,d,c,0,y,0);m.castShadow=false;const i=B(g,w-b*2,.014,d-b*2,shade(c,1.12),0,y,0);i.castShadow=false},
  rtable(g,w,d,h,c){const r=Math.min(w,d)/2;C(g,r,r,.04,c,0,h-.04,0,40);C(g,.05,.06,h-.1,shade(c,.7),0,.04,0,16);C(g,r*.45,r*.5,.04,shade(c,.7),0,0,0,32)},
  tent(g,w,d,h,c){const sh=new THREE.Shape();sh.moveTo(-w/2,0);sh.lineTo(w/2,0);sh.lineTo(0,h);sh.lineTo(-w/2,0);
    const geo=new THREE.ExtrudeGeometry(sh,{depth:d,bevelEnabled:false});geo.translate(0,0,-d/2);const m=new THREE.Mesh(geo,M(c,{side:THREE.DoubleSide}));m.castShadow=true;m.receiveShadow=true;g.add(m);
@@ -309,7 +309,7 @@ const BUILD={
    for(const s_ of[-1,1]){const pole=B(g,.03,.03,d+.12,'#c9a46a',0,h-.015,0);}B(g,w-.04,.03,d-.04,shade(c,1.15),0,0,0).castShadow=false;
    const fl=B(g,.004,.14,.004,'#c9a46a',0,h,-d/2+.05);const flag=new THREE.Mesh(new THREE.PlaneGeometry(.1,.07),M('#f2d15a',{side:THREE.DoubleSide}));flag.position.set(.05,h+.1,-d/2+.05);g.add(flag)},
  playmat(g,w,d,h,c){const cols=['#f6c9a8','#bfe0d0','#c9d6f2','#f3e3a7'];const nx=Math.max(1,Math.round(w/.5)),nz=Math.max(1,Math.round(d/.5));
-   for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=B(g,w/nx-.005,h,d/nz-.005,cols[(i+j)%4],-w/2+w/nx*(i+.5),0,-d/2+d/nz*(j+.5));m.castShadow=false}},
+   for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=B(g,w/nx-.005,h,d/nz-.005,cols[(i+j)%4],-w/2+w/nx*(i+.5),0,-d/2+d/nz*(j+.5));m.position.y+=.022;m.castShadow=false}},
  table(g,w,d,h,c){B(g,w,.04,d,c,0,h-.04,0);const lc=shade(c,.75);for(const a of[-1,1])for(const b of[-1,1])B(g,.06,h-.04,.06,lc,a*(w/2-.1),0,b*(d/2-.1))},
  chair(g,w,d,h,c){B(g,w,.05,d*.9,c,0,.43,.02);for(const a of[-1,1])for(const b of[-1,1])B(g,.035,.43,.035,shade(c,.7),a*(w/2-.04),0,b*(d/2-.05));B(g,w,h-.48,.04,c,0,.48,-d/2+.04)},
  desk(g,w,d,h,c){B(g,w,.03,d,c,0,h-.03,0);B(g,.03,h-.03,d,shade(c,.8),-w/2+.015,0,0);B(g,.03,h-.03,d,shade(c,.8),w/2-.015,0,0);B(g,w-.06,.3,.02,shade(c,.8),0,h-.35,-d/2+.02)},
@@ -360,7 +360,7 @@ const FURN={
  ctable:{n:'거실 테이블',c:'거실',w:1.2,d:.6,h:.4,col:'#3d3f41',b:'ctable'},
  tvstand:{n:'TV장',c:'거실',w:1.8,d:.4,h:.45,col:'#3a3532',b:'cabinet'},
  tv:{n:'벽걸이 TV 65"',c:'거실',w:1.45,d:.1,h:.84,col:'#111317',b:'tv'},
- rug:{n:'러그',c:'거실',w:3.0,d:2.0,h:.01,col:'#7f8a99',b:'rug'},
+ rug:{n:'러그',c:'거실',w:1.5,d:1.0,h:.01,col:'#7f8a99',b:'rug'},
  piano:{n:'업라이트 피아노',c:'거실',w:1.5,d:.6,h:1.25,col:'#1b1b1d',b:'piano'},
  dtable4:{n:'식탁 4인',c:'주방·식사',w:1.4,d:.8,h:.74,col:'#e8e4dc',b:'table'},
  dtable6:{n:'식탁 6인',c:'주방·식사',w:1.8,d:.9,h:.74,col:'#e8e4dc',b:'table'},
