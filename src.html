@@ -158,13 +158,6 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
         <button class="btn pri sm" id="bCompare" disabled>비교할 배치안을 고르세요</button>
       </div>
       <p class="hint" id="cmpHint">배치안 두 개에 체크하면 나란히 비교, 하나만 체크하면 지금 편집 중인 배치와 비교해요.</p>
-      <h3>코드로 주고받기</h3>
-      <p class="hint">저장하지 않고 배치만 주고받고 싶을 때 써요. 코드를 메신저로 보내면 받은 사람이 붙여 넣어 열 수 있어요.</p>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px">
-        <button class="btn sm" id="bExport">지금 배치를 코드로</button>
-        <button class="btn sm" id="bImport">붙여 넣은 코드 열기</button>
-      </div>
-      <textarea id="code" placeholder="배치 코드" aria-label="배치 코드"></textarea>
     </div>
   </aside>
 
@@ -215,7 +208,7 @@ const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return 
 const ROOMS=[
  {id:'terrace',n:'테라스',a:12.6,r:[0,0,7.6,1.7],f:'stone'},
  {id:'living',n:'거실',a:40.8,r:[0,1.7,7.6,7.3],f:'wood',lab:[3.8,4.6]},
- {id:'entry',n:'현관',r:[1.3,6.4,3.4,7.3],f:'entry',lab:[2.35,6.85],small:1},
+ {id:'entry',n:'현관',a:7.9,r:[1.2,7.3,3.6,10.6],f:'entry'},
  {id:'r1',n:'방1',a:14.7,r:[7.6,1.1,10.9,5.6],f:'wood'},
  {id:'r4',n:'방4',a:18.9,r:[10.9,0.5,14.6,4.8],f:'wood',extra:[[11.6,4.8,12.8,7.3]]},
  {id:'hall',n:'복도',a:6.5,r:[7.6,5.6,11.6,7.3],f:'wood',extra:[[10.9,4.8,11.6,5.6]],small:1},
@@ -224,8 +217,8 @@ const ROOMS=[
  {id:'r2',n:'방2',a:9.9,r:[5.95,7.3,8.9,10.9],f:'wood'},
  {id:'b1',n:'화장실1',a:5.7,r:[8.9,7.3,10.6,10.9],f:'tile'},
  {id:'r3',n:'방3',a:11.5,r:[10.6,7.3,13.4,11.5],f:'wood'},
- {id:'laundry',n:'세탁실',r:[3.6,10.6,5.5,12.6],f:'tile'},
- {id:'store',n:'창고',r:[3.6,12.6,5.5,14.1],f:'tile'},
+ {id:'laundry',n:'세탁실',a:6.6,r:[3.6,10.6,5.5,14.1],f:'tile'},
+ {id:'store',n:'창고',a:6.3,r:[1.8,10.6,3.6,14.1],f:'tile'},
 ];
 // [축, 고정좌표, 시작, 끝, 두께, 개구부[[a,b,종류,창턱,창상단]]]
 const SEGS=[
@@ -241,7 +234,6 @@ const SEGS=[
  ['h',10.6,3.6,5.95,.12,[[4.5,5.3,'door']]],
  ['h',10.9,5.95,10.6,.2,[[6.6,8.4,'win',.5,2.3]]],
  ['h',11.5,10.6,13.4,.2,[[11.0,13.0,'win',.5,2.3]]],
- ['h',12.6,3.6,5.5,.1,[[4.2,5.0,'door']]],
  ['h',14.1,3.6,5.5,.2,[[4.0,5.1,'win',.9,2.2]]],
  ['v',0,0,7.3,.2,[]],
  ['v',7.6,0,5.6,.12,[]],
@@ -250,7 +242,11 @@ const SEGS=[
  ['v',15.6,4.8,7.3,.2,[[5.3,6.8,'win',.9,2.2]]],
  ['v',11.6,4.8,7.3,.12,[[6.3,7.1,'door']]],
  ['v',12.8,4.8,7.3,.12,[[5.2,5.9,'door']]],
- ['v',3.6,7.3,14.1,.2,[]],
+ ['v',3.6,7.3,14.1,.12,[[12.0,12.8,'door']]],
+ ['v',1.8,10.6,14.1,.2,[]],
+ ['h',14.1,1.8,3.6,.2,[]],
+ ['v',1.2,7.3,10.6,.2,[[8.8,9.7,'door']]],
+ ['h',10.6,1.2,3.6,.2,[]],
  ['v',5.95,7.3,10.9,.12,[]],
  ['v',5.5,10.6,14.1,.2,[[11.0,12.3,'win',.9,2.2]]],
  ['v',8.9,7.3,10.9,.12,[]],
@@ -367,14 +363,14 @@ const CURRENT=[
  {t:'tvstand',x:.32,z:4.3,r:90},{t:'tv',x:.17,z:4.3,r:90},
  {t:'dtable6',x:2.6,z:2.8},{t:'chair',x:2.0,z:2.15},{t:'chair',x:2.6,z:2.15},{t:'chair',x:3.2,z:2.15},
  {t:'chair',x:2.0,z:3.45,r:180},{t:'chair',x:2.6,z:3.45,r:180},{t:'chair',x:3.2,z:3.45,r:180},
- {t:'lamp',x:7.25,z:2.5},{t:'plant',x:.5,z:2.1},{t:'shoe',x:.85,z:7.1,r:180},
+ {t:'lamp',x:7.25,z:2.5},{t:'plant',x:.5,z:2.1},{t:'shoe',x:3.32,z:8.2,r:-90},
  {t:'bed_q',x:9.85,z:3.2,r:-90},{t:'nightstand',x:10.63,z:2.15,r:-90},{t:'nightstand',x:10.63,z:4.25,r:-90},{t:'wardrobe',x:9.75,z:5.24,r:180,w:1.6},
  {t:'bed_k',x:13.55,z:2.7,r:-90},{t:'nightstand',x:14.33,z:1.45,r:-90},{t:'nightstand',x:14.33,z:3.95,r:-90},{t:'dresser',x:11.18,z:2.7,r:90},
  {t:'cube',x:6.13,z:8.9,r:90},{t:'desk',x:7.6,z:10.55,r:180},{t:'dchair',x:7.6,z:9.9},
  {t:'bed_q',x:12.35,z:9.65,r:-90,col:'#d9d2c4'},{t:'nightstand',x:13.13,z:8.45,r:-90},{t:'wardrobe',x:12.4,z:7.66},
  {t:'fridge',x:5.55,z:10.1,r:-90},
  {t:'lsink',x:5.2,z:11.4,r:-90},{t:'washer',x:5.15,z:12.15,r:-90},
- {t:'shelf',x:4.55,z:13.9,r:180},
+ {t:'shelf',x:2.7,z:13.9,r:180},{t:'shelf',x:1.97,z:11.4,r:90},
  {t:'plant',x:7.1,z:.45},{t:'arm',x:6.0,z:.85}
 ];
 
@@ -409,7 +405,7 @@ function buildHouse(ctx){
   const H=wallMode==='full'?2.6:wallMode==='low'?1.0:.05;
   ROOMS.forEach((r,i)=>{[r.r,...(r.extra||[])].forEach(q=>{const[x1,z1,x2,z2]=q;
     const col=r.f==='wood'?shade(FLOOR.wood,1+(i%3)*.03):FLOOR[r.f];
-    const m=B(g,x2-x1,r.f==='entry'?.025:.02,z2-z1,col,(x1+x2)/2,r.f==='entry'?0:-.0,(z1+z2)/2,{roughness:r.f==='wood'?.55:.8});m.castShadow=false;
+    const m=B(g,x2-x1,.02,z2-z1,col,(x1+x2)/2,0,(z1+z2)/2,{roughness:r.f==='wood'?.55:.8});m.castShadow=false;
     if(r.f==='tile'||r.f==='stone'||r.f==='entry'){const gr=new THREE.GridHelper(1,1);gr.visible=false}
   })});
   // 타일 줄눈
@@ -476,7 +472,7 @@ function select(id){selId=id;const it=cur();$('sel').hidden=!it;if(!it){selBox.v
   const ci=document.createElement('input');ci.type='color';ci.id='sCol';ci.value=it.col;ci.title='직접 고르기';ci.oninput=()=>{it.col=ci.value;refreshObj(it);changed()};ci.onfocus=()=>pushHist();sw.appendChild(ci);
   updSelBox()}
 function updSelPanel(){const it=cur();if(!it)return;$('sPos').textContent=`위치 ${Math.round(it.x*1000)}, ${Math.round(it.z*1000)} mm · 방향 ${((it.r%360)+360)%360}° · ${roomAt(it.x,it.z)}`}
-function roomAt(x,z){for(const r of ROOMS){for(const q of[r.r,...(r.extra||[])]){if(r.id==='entry')continue;if(x>=q[0]&&x<=q[2]&&z>=q[1]&&z<=q[3])return r.n}}return '집 밖'}
+function roomAt(x,z){for(const r of ROOMS){for(const q of[r.r,...(r.extra||[])]){if(x>=q[0]&&x<=q[2]&&z>=q[1]&&z<=q[3])return r.n}}return '집 밖'}
 
 /* 되돌리기 · 변경 감지 */
 let hist=[],dirty=false;
@@ -504,7 +500,7 @@ function loop(){requestAnimationFrame(loop);
 size();loop();
 
 function setView(v,room){const r=room?ROOMS.find(x=>x.id===room):null;
-  let t,span;if(r){const[x1,z1,x2,z2]=r.r;t=new THREE.Vector3((x1+x2)/2,0,(z1+z2)/2);span=Math.max(x2-x1,z2-z1)}else{t=new THREE.Vector3(CENTER[0],0,CENTER[1]);span=15}
+  let t,span;if(r){const[x1,z1,x2,z2]=r.r;t=new THREE.Vector3((x1+x2)/2,0,(z1+z2)/2);span=Math.max(5,x2-x1,z2-z1)}else{t=new THREE.Vector3(CENTER[0],0,CENTER[1]);span=15}
   const k=stage.clientWidth<stage.clientHeight?1.5:1;
   const p=v==='top'?new THREE.Vector3(t.x,span*1.25*k+1.5,t.z+.01):new THREE.Vector3(t.x,span*.8*k+1.5,t.z+span*.72*k+1.2);
   camGoal={p,t};document.querySelectorAll('#viewSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v))}
@@ -649,14 +645,6 @@ $('bNewCur').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 �
 $('author').value=ls.get('furn-author')||'';
 $('author').addEventListener('change',()=>{ls.set('furn-author',myName());renderPlans()});
 $('ptitle').addEventListener('input',()=>{if(curPlan.id)changed()});
-
-/* 코드 내보내기/가져오기 */
-$('bExport').onclick=()=>{const d=planData();const s=btoa(unescape(encodeURIComponent(JSON.stringify({v:1,t:d.title,a:d.author,i:d.items.map(i=>[i.t,i.x,i.z,i.r,i.w,i.d,i.h,i.col])}))));
-  const ta=$('code');ta.value='FURN1:'+s;ta.select();if(navigator.clipboard)navigator.clipboard.writeText(ta.value).then(()=>toast('코드를 복사했어요')).catch(()=>toast('코드를 선택했어요 · 복사해서 보내세요'));else toast('코드를 선택했어요 · 복사해서 보내세요')};
-$('bImport').onclick=()=>{try{const raw=$('code').value.trim().replace(/^FURN1:/,'');const o=JSON.parse(decodeURIComponent(escape(atob(raw))));
-  const list=o.i.filter(a=>FURN[a[0]]).map(a=>({t:a[0],x:a[1],z:a[2],r:a[3],w:a[4],d:a[5],h:a[6],col:/^#[0-9a-f]{6}$/i.test(a[7])?a[7]:undefined}));
-  endCompare();hist=[];setItems(list);curPlan={id:null,author:null};$('ptitle').value=String(o.t||'받은 배치').slice(0,40);dirty=true;setStatus();renderPlans();
-  toast(`'${o.a||'가족'}'의 배치를 열었어요 · 저장하면 목록에 올라가요`)}catch(e){toast('코드를 읽지 못했어요 · 전체를 그대로 붙여 넣어 주세요')}};
 
 /* ───────── 비교 ───────── */
 $('bCompare').onclick=()=>{const all=[BUILTIN,...plans];const sel=[...checked].map(id=>all.find(p=>p.id===id)).filter(Boolean);
