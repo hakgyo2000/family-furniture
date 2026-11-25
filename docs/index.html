@@ -208,7 +208,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795590819';
+const APP_VER='1795591246';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -350,6 +350,10 @@ const BUILD={
    B(g,w+.01,.04,d+.01,'#efe9dd',0,h-.04,0);const r=Math.min(.13,w*.1,d*.24);
    for(const sx of[-1,1]){const x=sx*Math.min(w*.22,.3);C(g,r,r,.008,'#1f2124',x,h,0,32,{roughness:.4});C(g,r*.62,r*.62,.01,'#3a3d42',x,h,0,28);C(g,r*.3,r*.3,.012,'#1f2124',x,h,0,20);
      for(let k=0;k<4;k++){const a=k*Math.PI/2+Math.PI/4;B(g,.012,.014,r*.9,'#2a2c30',x+Math.sin(a)*r*.55,h+.01,Math.cos(a)*r*.55).rotation.y=a}}},
+ basin(g,w,d,h,c){B(g,w,h-.1,d-.02,c,0,.06,-.01);B(g,w-.04,.06,d-.06,shade(c,.6),0,0,-.03);B(g,.006,h-.18,.006,shade(c,.75),0,.1,d/2-.02);
+   for(const sx of[-1,1])B(g,.015,.12,.015,'#9aa0a6',sx*.05,h*.55,d/2-.01);B(g,w+.01,.04,d+.01,'#fbfbfa',0,h-.04,0);
+   const bw=Math.min(w*.62,.48),bd=Math.min(d*.62,.34);const m=C(g,.5,.5,.012,'#e3e6ea',0,h,.02,32,{roughness:.25});m.scale.set(bw,1,bd);
+   C(g,.014,.014,.16,'#b8bec5',0,h,-d/2+.07,10,{metalness:.7,roughness:.25});B(g,.025,.02,.11,'#b8bec5',0,h+.14,-d/2+.12,{metalness:.7,roughness:.25})},
  ksink(g,w,d,h,c){B(g,w,h-.12,d-.02,c,0,.08,-.01);B(g,w-.02,.08,d-.06,shade(c,.5),0,0,-.03);const n=Math.max(1,Math.round(w/.45));for(let i=1;i<n;i++)B(g,.006,h-.2,.006,shade(c,.7),-w/2+w*i/n,.1,d/2-.02);
    B(g,w+.01,.04,d+.01,'#efe9dd',0,h-.04,0);B(g,Math.min(.55,w*.45),.012,d*.62,'#8d9399',-w*.18,h,.02,{metalness:.6,roughness:.3});C(g,.015,.015,.25,'#9aa0a6',-w*.18,h,-d/2+.08,8,{metalness:.6,roughness:.3})},
  hanger(g,w,d,h,c){for(const s of[-1,1]){B(g,.04,h,.04,c,s*(w/2-.02),0,0);B(g,.04,.03,d,c,s*(w/2-.02),0,0)}B(g,w,.03,.03,c,0,h-.05,0);
@@ -390,6 +394,7 @@ const FURN={
  display:{n:'장식장',c:'서재·수납',w:1.2,d:.35,h:1.0,col:'#1e1f22',b:'display'},
  shoe:{n:'신발장',c:'서재·수납',w:1.2,d:.35,h:1.0,col:'#e3ddd2',b:'shoe'},
  hanger:{n:'행거',c:'침실',w:1.2,d:.45,h:1.0,col:'#2b2b2e',b:'hanger'},
+ basin:{n:'세면대',c:'욕실·세탁',w:.6,d:.45,h:.85,col:'#d8d4cc',b:'basin'},
  toilet:{n:'변기',c:'욕실·세탁',w:.42,d:.7,h:.75,col:'#fbfbfa',b:'toilet'},
  washer:{n:'세탁기',c:'욕실·세탁',w:.6,d:.65,h:.85,col:'#f0f1f2',b:'washer'},
  dryer:{n:'건조기',c:'욕실·세탁',w:.6,d:.65,h:.85,col:'#d5d8dc',b:'washer'},
