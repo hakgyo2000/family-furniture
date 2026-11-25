@@ -171,6 +171,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
       <div class="seg" id="viewSeg"><button data-v="3d" aria-pressed="true">3D</button><button data-v="top" aria-pressed="false">위에서</button></div>
       <div class="seg" id="wallSeg"><button data-w="low" aria-pressed="true">낮은 벽</button><button data-w="full" aria-pressed="false">실제 벽</button><button data-w="none" aria-pressed="false">벽 숨김</button></div>
       <div class="seg"><button id="bUndo" title="되돌리기 (Ctrl+Z)">↶ 되돌리기</button><button id="bLabels" aria-pressed="true">방 이름</button></div>
+      <button class="btn pri sm" id="bPng" style="margin-left:auto" title="지금 보이는 화면을 PNG 그림으로 저장">그림으로 저장</button>
     </div>
     <div class="dpad" id="dpad" role="group" aria-label="평면도 이동">
       <button data-d="up" aria-label="위로 이동">▲</button><button data-d="left" aria-label="왼쪽으로 이동">◀</button><button data-d="home" aria-label="집 전체 보기">전체</button><button data-d="right" aria-label="오른쪽으로 이동">▶</button><button data-d="down" aria-label="아래로 이동">▼</button>
@@ -510,7 +511,8 @@ const cmpStack=()=>stage.clientWidth<700;
 let camGoal=null;
 function loop(){requestAnimationFrame(loop);
   if(camGoal){camera.position.lerp(camGoal.p,.14);controls.target.lerp(camGoal.t,.14);if(camera.position.distanceTo(camGoal.p)<.02)camGoal=null}
-  controls.update();
+  controls.update();draw()}
+function draw(){
   const w=stage.clientWidth,h=stage.clientHeight;
   if(compare){renderer.setScissorTest(true);
     const vp=cmpStack()?[[0,h/2,w,h/2],[0,0,w,h/2]]:[[0,0,w/2,h],[w/2,0,w/2,h]];
@@ -518,6 +520,23 @@ function loop(){requestAnimationFrame(loop);
     renderer.setScissorTest(false)}
   else{renderer.setViewport(0,0,w,h);renderer.render(main.scene,camera)}}
 size();loop();
+
+/* 지금 화면을 PNG로 저장 */
+function stamp(){const d=new Date(),z=n=>String(n).padStart(2,'0');return`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`}
+async function savePng(){const btn=$('bPng');btn.disabled=true;
+  const vis=[selBox.visible,rotRing.visible];selBox.visible=rotRing.visible=false;draw();
+  const W=cv.width,H=cv.height,k=W/stage.clientWidth;const out=document.createElement('canvas');out.width=W;out.height=H;const x=out.getContext('2d');x.drawImage(cv,0,0);
+  selBox.visible=vis[0];rotRing.visible=vis[1];
+  const tag=(t,px,py)=>{x.font=`600 ${Math.round(13*k)}px "IBM Plex Sans KR",sans-serif`;const tw=x.measureText(t).width,pd=8*k;
+    x.fillStyle='rgba(255,255,255,.88)';x.fillRect(px,py,tw+pd*2,24*k);x.fillStyle='#1c232b';x.textBaseline='middle';x.fillText(t,px+pd,py+12*k)};
+  if(compare){const st=cmpStack();tag($('cmpA').textContent,10*k,10*k);tag($('cmpB').textContent,st?10*k:W/2+10*k,st?H/2+10*k:10*k)}
+  else tag(`${$('ptitle').value.trim()||'이름 없는 배치'} · ${$('author').value.trim()||'이름 없음'} · ${new Date().toLocaleDateString('ko-KR')}`,10*k,H-34*k);
+  const blob=await new Promise(r=>out.toBlob(r,'image/png'));btn.disabled=false;if(!blob){toast('그림을 만들지 못했어요');return}
+  const name=`가구배치_${($('ptitle').value.trim()||'배치').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,30)}_${stamp()}.png`;
+  const file=new File([blob],name,{type:'image/png'});
+  if(coarse&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==='AbortError')return}}
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);toast('그림을 저장했어요')}
+$('bPng').onclick=savePng;
 
 function setView(v,room){const r=room?ROOMS.find(x=>x.id===room):null;
   let t,span;if(r){const[x1,z1,x2,z2]=r.r;t=new THREE.Vector3((x1+x2)/2,0,(z1+z2)/2);span=Math.max(5,x2-x1,z2-z1)}else{t=new THREE.Vector3(CENTER[0],0,CENTER[1]);span=15}
