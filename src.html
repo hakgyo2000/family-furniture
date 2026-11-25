@@ -337,6 +337,8 @@ const BUILD={
  tower(g,w,d,h,c){const r=Math.min(w,d)/2;C(g,r,r,h-.04,c,0,0,0,32,{roughness:.45});C(g,r*.98,r*.98,.04,shade(c,.75),0,h-.04,0,32);
    for(let k=1;k<=4;k++)C(g,r*1.005,r*1.005,.012,shade(c,.85),0,h*.12+k*h*.11,0,32);C(g,r*.4,r*.4,.006,'#cfe3f4',0,h,0,24,{emissive:'#7fb2e5',emissiveIntensity:.35})},
  shoe(g,w,d,h,c){BUILD.wardrobe(g,w,d,h,c)},
+ display(g,w,d,h,c){const t=.025;B(g,t,h,d,c,-w/2+t/2,0,0);B(g,t,h,d,c,w/2-t/2,0,0);B(g,w,t,d,c,0,h-t,0);B(g,w,.06,d,c,0,0,0);B(g,w-2*t,h-.06-t,.012,shade(c,1.4),0,.06,-d/2+.006);
+   const n=3,ih=(h-.06-t)/n;for(let i=1;i<n;i++)B(g,w-2*t,t,d-.012,c,0,.06+ih*i-t/2,.006)},
  toilet(g,w,d,h,c){B(g,w*.9,.4,d*.68,c,0,0,d/2-d*.34);B(g,w*.88,.03,d*.62,shade(c,.94),0,.4,d/2-d*.34);B(g,w,h-.36,d*.28,c,0,.36,-d/2+d*.14)},
  ksink(g,w,d,h,c){B(g,w,h-.12,d-.02,c,0,.08,-.01);B(g,w-.02,.08,d-.06,shade(c,.5),0,0,-.03);const n=Math.max(1,Math.round(w/.45));for(let i=1;i<n;i++)B(g,.006,h-.2,.006,shade(c,.7),-w/2+w*i/n,.1,d/2-.02);
    B(g,w+.01,.04,d+.01,'#efe9dd',0,h-.04,0);B(g,Math.min(.55,w*.45),.012,d*.62,'#8d9399',-w*.18,h,.02,{metalness:.6,roughness:.3});C(g,.015,.015,.25,'#9aa0a6',-w*.18,h,-d/2+.08,8,{metalness:.6,roughness:.3})},
@@ -373,6 +375,7 @@ const FURN={
  shelf:{n:'책장',c:'서재·수납',w:.8,d:.3,h:1.8,col:'#efe9df',b:'shelf'},
  cube:{n:'칸 책장',c:'서재·수납',w:2.0,d:.35,h:1.9,col:'#f2f0ec',b:'cube'},
  cabinet:{n:'수납장',c:'서재·수납',w:.8,d:.4,h:.9,col:'#efe9df',b:'cabinet'},
+ display:{n:'장식장',c:'서재·수납',w:1.2,d:.35,h:1.1,col:'#1e1f22',b:'display'},
  shoe:{n:'신발장',c:'서재·수납',w:1.2,d:.35,h:1.1,col:'#e3ddd2',b:'shoe'},
  hanger:{n:'행거',c:'침실',w:1.2,d:.45,h:1.7,col:'#2b2b2e',b:'hanger'},
  toilet:{n:'변기',c:'욕실·세탁',w:.42,d:.7,h:.75,col:'#fbfbfa',b:'toilet'},
