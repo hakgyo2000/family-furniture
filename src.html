@@ -321,7 +321,7 @@ const BUILD={
  cube(g,w,d,h,c){const t=.022,dk=shade(c,.35);B(g,t,h,d,dk,-w/2+t/2,0,0);B(g,t,h,d,dk,w/2-t/2,0,0);B(g,w,t,d,dk,0,h-t,0);B(g,w,.05,d,dk,0,0,0);B(g,w,h,.01,c,0,0,-d/2+.005);
    const nx=Math.max(1,Math.round(w/.4)),ny=Math.max(1,Math.round(h/.38));for(let i=1;i<nx;i++)B(g,t,h-.07,d,dk,-w/2+w*i/nx,.05,0);for(let j=1;j<ny;j++)B(g,w,t,d,dk,0,.05+(h-.07)*j/ny,0)},
  fridge(g,w,d,h,c){B(g,w,h,d-.03,c,0,0,-.015,{metalness:.35,roughness:.35});B(g,w-.02,.006,.006,shade(c,.6),0,h*.62,d/2-.03);B(g,.006,h*.38,.006,shade(c,.6),0,h*.62,d/2-.03);
-   for(const s of[-1,1])B(g,.025,.35,.03,'#9aa0a6',s*.06,h*.75,d/2-.015);B(g,.4,.025,.03,'#9aa0a6',0,h*.5,d/2-.015)},
+   const hl=Math.min(.3,h*.38-.1);for(const s of[-1,1])B(g,.025,hl,.03,'#9aa0a6',s*.06,h*.62+.04,d/2-.015);B(g,.4,.025,.03,'#9aa0a6',0,h*.46,d/2-.015)},
  washer(g,w,d,h,c){B(g,w,h,d,c,0,0,0,{roughness:.4});const r=Math.min(w,h)*.33;const m=C(g,r,r,.03,'#3b4350',0,0,0,28);m.rotation.x=Math.PI/2;m.position.set(0,h*.45,d/2+.012);
    const i=C(g,r*.75,r*.75,.035,'#6f7f92',0,0,0,28,{metalness:.5,roughness:.2});i.rotation.x=Math.PI/2;i.position.set(0,h*.45,d/2+.014);B(g,w-.06,.08,.01,'#c9ced4',0,h-.1,d/2+.005)},
  lsink(g,w,d,h,c){B(g,w,h-.12,d,'#6d6f73',0,0,0);B(g,w,.12,d,c,0,h-.12,0);B(g,w-.12,.02,d-.15,'#cfd3d7',0,h-.005,.02)},
@@ -347,6 +347,12 @@ const BUILD={
    B(g,w+.01,.04,d+.01,'#efe9dd',0,h-.04,0);const r=Math.min(.13,w*.1,d*.24);
    for(const sx of[-1,1]){const x=sx*Math.min(w*.22,.3);C(g,r,r,.008,'#1f2124',x,h,0,32,{roughness:.4});C(g,r*.62,r*.62,.01,'#3a3d42',x,h,0,28);C(g,r*.3,r*.3,.012,'#1f2124',x,h,0,20);
      for(let k=0;k<4;k++){const a=k*Math.PI/2+Math.PI/4;B(g,.012,.014,r*.9,'#2a2c30',x+Math.sin(a)*r*.55,h+.01,Math.cos(a)*r*.55).rotation.y=a}}},
+ bathtub(g,w,d,h,c){B(g,w,h,d,c,0,0,0,{roughness:.3});const rim=.08;B(g,w-rim*2,.01,d-rim*2,'#dfe7ec',0,h-.005,0,{roughness:.2});B(g,w-rim*2-.04,.012,d-rim*2-.04,'#cfdde6',0,h-.004,0,{roughness:.15});
+   C(g,.016,.016,.14,'#b8bec5',-w/2+rim/2,h,0,10,{metalness:.7,roughness:.25});B(g,.12,.02,.025,'#b8bec5',-w/2+rim+.04,h+.12,0,{metalness:.7,roughness:.25})},
+ shower(g,w,d,h,c){B(g,w,.06,d,'#eceeef',0,0,0);B(g,w-.08,.008,d-.08,'#d9dee2',0,.06,0);const gl=M('#a9cbe0',{transparent:true,opacity:.28,depthWrite:false,roughness:.1});
+   const fr=M('#b8bec5',{metalness:.7,roughness:.25});const pane=(pw,x,z,ry)=>{const m=B(g,pw,h-.06,.012,gl,x,.06,z);m.rotation.y=ry;m.castShadow=false};
+   pane(w,0,d/2-.006,0);pane(d,w/2-.006,0,Math.PI/2);B(g,.025,h-.06,.025,fr,w/2-.012,.06,d/2-.012);B(g,.025,h-.06,.025,fr,-w/2+.012,.06,d/2-.012);B(g,.025,h-.06,.025,fr,w/2-.012,.06,-d/2+.012);
+   B(g,w,.025,.025,fr,0,h-.025,d/2-.012);B(g,.025,.025,d,fr,w/2-.012,h-.025,0);C(g,.012,.012,h-.2,'#b8bec5',-w/2+.08,.06,-d/2+.08,10,{metalness:.7,roughness:.25});C(g,.08,.08,.02,'#b8bec5',-w/2+.14,h-.16,-d/2+.14,20,{metalness:.7,roughness:.25})},
  basin(g,w,d,h,c){B(g,w,h-.1,d-.02,c,0,.06,-.01);B(g,w-.04,.06,d-.06,shade(c,.6),0,0,-.03);B(g,.006,h-.18,.006,shade(c,.75),0,.1,d/2-.02);
    for(const sx of[-1,1])B(g,.015,.12,.015,'#9aa0a6',sx*.05,h*.55,d/2-.01);B(g,w+.01,.04,d+.01,'#fbfbfa',0,h-.04,0);
    const bw=Math.min(w*.62,.48),bd=Math.min(d*.62,.34);const m=C(g,.5,.5,.012,'#e3e6ea',0,h,.02,32,{roughness:.25});m.scale.set(bw,1,bd);
@@ -391,6 +397,8 @@ const FURN={
  display:{n:'장식장',c:'서재·수납',w:1.2,d:.35,h:1.0,col:'#1e1f22',b:'display'},
  shoe:{n:'신발장',c:'서재·수납',w:1.2,d:.35,h:1.0,col:'#e3ddd2',b:'shoe'},
  hanger:{n:'행거',c:'침실',w:1.2,d:.45,h:1.0,col:'#2b2b2e',b:'hanger'},
+ bathtub:{n:'욕조',c:'욕실·세탁',w:1.6,d:.75,h:.55,col:'#f4f4f2',b:'bathtub'},
+ shower:{n:'샤워부스',c:'욕실·세탁',w:.9,d:.9,h:1.0,col:'#eceeef',b:'shower'},
  basin:{n:'세면대',c:'욕실·세탁',w:.6,d:.45,h:.85,col:'#d8d4cc',b:'basin'},
  toilet:{n:'변기',c:'욕실·세탁',w:.42,d:.7,h:.75,col:'#fbfbfa',b:'toilet'},
  washer:{n:'세탁기',c:'욕실·세탁',w:.6,d:.65,h:.85,col:'#f0f1f2',b:'washer'},
