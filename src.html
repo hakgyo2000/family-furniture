@@ -197,6 +197,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
+const APP_VER='__BUILD__';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -486,8 +487,8 @@ let hist=[],dirty=false;
 function pushHist(){hist.push(JSON.stringify(items));if(hist.length>80)hist.shift()}
 function mut(fn){pushHist();fn();changed()}
 function undo(){if(!hist.length){toast('되돌릴 작업이 없어요');return}const keep=selId;items=JSON.parse(hist.pop());syncCtx(main,items);select(items.some(i=>i.id===keep)?keep:null);changed()}
-let draftT;function changed(){dirty=true;setStatus();clearTimeout(draftT);draftT=setTimeout(saveDraft,400)}
-function saveDraft(){ls.set('furn-draft',{items,title:$('ptitle').value,planId:curPlan.id,owner:curPlan.author,dirty})}
+let draftT,edited=false;function changed(){dirty=true;edited=true;setStatus();clearTimeout(draftT);draftT=setTimeout(saveDraft,400)}
+function saveDraft(){ls.set('furn-draft',{items,title:$('ptitle').value,planId:curPlan.id,owner:curPlan.author,dirty,edited,ver:APP_VER})}
 
 /* ───────── 화면 크기 · 렌더 루프 ───────── */
 let compare=null;
@@ -624,7 +625,7 @@ function renderPlans(){const el=$('plans');el.textContent='';
 function twoStep(btn,need,label,fn){if(!need){fn();return}if(btn.dataset.armed){fn();return}const old=btn.textContent;btn.dataset.armed=1;btn.textContent=label;setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old}},3000)}
 function updCmpBtn(){for(const id of[...checked])if(id!==BUILTIN.id&&!plans.some(p=>p.id===id))checked.delete(id);
   const b=$('bCompare');b.disabled=!checked.size;b.textContent=checked.size===2?'두 배치안 나란히 비교':checked.size===1?'편집 중인 배치와 비교':'비교할 배치안을 고르세요'}
-function openPlan(p){endCompare();hist=[];setItems((p.items||[]).map(i=>Object.assign({},i)));
+function openPlan(p){endCompare();hist=[];edited=false;setItems((p.items||[]).map(i=>Object.assign({},i)));
   curPlan=p.builtin?{id:null,author:null}:{id:p.id,author:p.author};
   $('ptitle').value=p.builtin?'':(p.title||'');dirty=!!p.builtin;setStatus();renderPlans();saveDraft();toast(`'${p.title||'배치안'}' 열었어요`)}
 function planData(){return{title:$('ptitle').value.trim().slice(0,60)||'이름 없는 배치',author:myName().slice(0,30)||'이름 없음',
@@ -647,7 +648,7 @@ async function save(asNew){ls.set('furn-author',myName());
 async function deletePlan(p){try{await api('plans?id=eq.'+encodeURIComponent(p.id),{method:'DELETE'})}catch(e){toast('삭제하지 못했어요');return}
   if(curPlan.id===p.id){curPlan={id:null,author:null};dirty=true}toast('삭제했어요');await refresh()}
 $('bSave').onclick=()=>save(false);$('bSaveAs').onclick=()=>save(true);
-$('bNewEmpty').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 새로',()=>{endCompare();hist=[];setItems([]);curPlan={id:null,author:null};$('ptitle').value='';dirty=true;setStatus();renderPlans();toast('빈 집에서 시작해요')});
+$('bNewEmpty').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 새로',()=>{endCompare();hist=[];setItems([]);curPlan={id:null,author:null};$('ptitle').value='';dirty=true;edited=true;saveDraft();setStatus();renderPlans();toast('빈 집에서 시작해요')});
 $('bNewCur').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 새로',()=>openPlan(BUILTIN));
 $('author').value=ls.get('furn-author')||'';
 $('author').addEventListener('change',()=>{ls.set('furn-author',myName());renderPlans()});
@@ -674,8 +675,13 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBg);new
 
 /* ───────── 시작 ───────── */
 const draft=ls.get('furn-draft');
-if(draft&&Array.isArray(draft.items)){setItems(draft.items.filter(i=>FURN[i.t]));curPlan={id:draft.planId||null,author:draft.owner||null};$('ptitle').value=draft.title||'';dirty=!!draft.dirty}
+if(draft&&Array.isArray(draft.items)&&(draft.edited||draft.planId)){setItems(draft.items.filter(i=>FURN[i.t]));curPlan={id:draft.planId||null,author:draft.owner||null};$('ptitle').value=draft.title||'';dirty=!!draft.dirty;edited=!!draft.edited}
 else{setItems(CURRENT);dirty=true}
 renderPlans();setStatus();refresh();
+/* 새 버전 알림: GitHub Pages가 페이지를 10분 정도 캐시해서, 최신 판이 있으면 새로고침을 권해요 */
+function checkVersion(){fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(h=>{const m=h.match(/const APP_VER='(\d+)'/);
+  if(m&&m[1]!==APP_VER&&!$('upd')){const b=document.createElement('button');b.id='upd';b.className='btn pri sm';b.textContent='새 버전이 있어요 · 눌러서 새로고침';
+    b.onclick=()=>{saveDraft();location.replace(location.pathname+'?v='+m[1])};$('stext').parentNode.after(b)}}).catch(()=>{})}
+checkVersion();setInterval(()=>{if(document.visibilityState==='visible')checkVersion()},120000);
 })();
 </script>

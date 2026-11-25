@@ -2,6 +2,8 @@ import os
 d=os.path.dirname(os.path.abspath(__file__))
 src=open(os.path.join(d,'src.html'),encoding='utf-8').read()
 i=src.index('<div class="app"')
+import time
+src=src.replace('__BUILD__',str(int(time.time())))
 head,body=src[:i],src[i:]
 out=('<!doctype html>\n<html lang="ko"><head><meta charset="utf-8">'
  '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
