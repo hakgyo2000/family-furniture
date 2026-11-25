@@ -105,6 +105,12 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 .lightbox img{max-height:100%;max-width:100%;border-radius:6px}
 .lightbox p{position:absolute;bottom:max(16px,env(safe-area-inset-bottom,0px));color:#fff;font-size:13px}
 .mob-toggle{display:none}
+.dpad{position:absolute;right:max(10px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);display:none;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(3,42px);gap:4px;touch-action:none;user-select:none;-webkit-user-select:none}
+.dpad button{border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 88%,transparent);border-radius:10px;font-size:15px;color:var(--ink);padding:0;touch-action:none;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.dpad button:active,.dpad button.on{background:var(--ink);color:var(--panel)}
+.dpad [data-d=up]{grid-area:1/2}.dpad [data-d=left]{grid-area:2/1}.dpad [data-d=home]{grid-area:2/2;font-size:12px}.dpad [data-d=right]{grid-area:2/3}.dpad [data-d=down]{grid-area:3/2}
+@media (max-width:820px),(pointer:coarse){.dpad{display:grid}}
+@media (max-width:820px){.stage:has(#sel:not([hidden])) .dpad{display:none}.dpad{top:auto;bottom:10px;transform:none}}
 
 @media (max-width:820px){
   .app{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"top" "stage" "side"}
@@ -171,6 +177,9 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
       <div class="seg" id="wallSeg"><button data-w="low" aria-pressed="true">낮은 벽</button><button data-w="full" aria-pressed="false">실제 벽</button><button data-w="none" aria-pressed="false">벽 숨김</button></div>
       <div class="seg"><button id="bUndo" title="되돌리기 (Ctrl+Z)">↶ 되돌리기</button><button id="bLabels" aria-pressed="true">방 이름</button></div>
     </div>
+    <div class="dpad" id="dpad" role="group" aria-label="평면도 이동">
+      <button data-d="up" aria-label="위로 이동">▲</button><button data-d="left" aria-label="왼쪽으로 이동">◀</button><button data-d="home" aria-label="집 전체 보기">전체</button><button data-d="right" aria-label="오른쪽으로 이동">▶</button><button data-d="down" aria-label="아래로 이동">▼</button>
+    </div>
     <div class="legend">가구 드래그: 이동 · 파란 고리 드래그: 자유 회전 · 빈 곳에 클릭 후 드래그: 시점 회전 · 빈 곳에 우클릭 후 드래그: 평면도 이동 · 휠/두 손가락: 확대 · R: 15° 회전</div>
     <div id="cmpUi" hidden>
       <div class="cmp-label" id="cmpA"></div><div class="cmp-label" id="cmpB"></div>
@@ -200,7 +209,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795580738';
+const APP_VER='1795581158';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -395,7 +404,8 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const camera=new THREE.PerspectiveCamera(42,1,.1,200);
 camera.position.set(CENTER[0],17,CENTER[1]+15);
 const controls=new THREE.OrbitControls(camera,cv);
-controls.target.set(CENTER[0],0,CENTER[1]);controls.enableDamping=true;controls.dampingFactor=.12;
+controls.target.set(CENTER[0],0,CENTER[1]);controls.enableDamping=true;controls.dampingFactor=.22;
+const coarse=matchMedia('(pointer:coarse)').matches;controls.rotateSpeed=coarse?.38:.5;controls.zoomSpeed=.7;controls.panSpeed=.8;
 controls.maxPolarAngle=Math.PI/2-.08;controls.minDistance=2;controls.maxDistance=45;controls.screenSpacePanning=false;
 controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
 
@@ -585,6 +595,20 @@ addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)
   if(e.key==='r'||e.key==='R'){rot(e.shiftKey?15:-15);e.preventDefault()}
   else if(e.key==='Delete'||e.key==='Backspace'){$('sDel').click();e.preventDefault()}
   else if(e.key.startsWith('Arrow')){const s=e.shiftKey?.01:.05;mut(()=>{if(e.key==='ArrowLeft')it.x-=s;if(e.key==='ArrowRight')it.x+=s;if(e.key==='ArrowUp')it.z-=s;if(e.key==='ArrowDown')it.z+=s});main.map.get(it.id).position.set(it.x,0,it.z);updSelBox();e.preventDefault()}});
+
+/* 네 방향 이동 버튼 */
+const PAN={up:[0,1],down:[0,-1],left:[-1,0],right:[1,0]};let panDir=null,panBtn=null;
+function panStep(){if(!panDir)return;const dist=camera.position.distanceTo(controls.target),sp=Math.max(.012,dist*.0035);
+  const f=new THREE.Vector3();camera.getWorldDirection(f);f.y=0;if(f.lengthSq()<1e-4)f.set(0,0,-1);f.normalize();const r=new THREE.Vector3(-f.z,0,f.x);
+  const d=f.multiplyScalar(panDir[1]).add(r.multiplyScalar(panDir[0])).multiplyScalar(sp);
+  const t=controls.target.clone().add(d);t.x=Math.max(-3,Math.min(19,t.x));t.z=Math.max(-3,Math.min(17,t.z));d.subVectors(t,controls.target);
+  camera.position.add(d);controls.target.copy(t);camGoal=null;requestAnimationFrame(panStep)}
+function panStop(){panDir=null;if(panBtn)panBtn.classList.remove('on');panBtn=null}
+document.querySelectorAll('#dpad button').forEach(b=>{
+  b.addEventListener('pointerdown',e=>{e.preventDefault();if(b.dataset.d==='home'){roomSel.value='';setView(view,null);return}
+    panStop();panDir=PAN[b.dataset.d];panBtn=b;b.classList.add('on');try{b.setPointerCapture(e.pointerId)}catch(_){}requestAnimationFrame(panStep)});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,panStop));
+  b.addEventListener('contextmenu',e=>e.preventDefault())});
 
 /* 탭 · 모바일 시트 */
 const tabs={f:$('tab-f'),p:$('tab-p')};
