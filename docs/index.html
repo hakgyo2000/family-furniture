@@ -83,7 +83,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 .seg button + button{border-left:1px solid var(--line)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
 .tool select{border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:6px 8px;font-size:12.5px}
-.legend{position:absolute;left:10px;bottom:10px;font-size:11.5px;color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);border-radius:6px;padding:5px 8px;pointer-events:none}
+.legend{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 340px);line-height:1.5;font-size:11.5px;color:var(--muted);background:color-mix(in srgb,var(--panel) 85%,transparent);border-radius:6px;padding:5px 8px;pointer-events:none}
 .cmp-label{position:absolute;top:56px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 9px;font-size:12.5px;font-weight:600;max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cmp-bar{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 8px 6px 12px;font-size:12.5px;white-space:nowrap}
 .divider{position:absolute;background:var(--line);pointer-events:none}
@@ -171,7 +171,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
       <div class="seg" id="wallSeg"><button data-w="low" aria-pressed="true">낮은 벽</button><button data-w="full" aria-pressed="false">실제 벽</button><button data-w="none" aria-pressed="false">벽 숨김</button></div>
       <div class="seg"><button id="bUndo" title="되돌리기 (Ctrl+Z)">↶ 되돌리기</button><button id="bLabels" aria-pressed="true">방 이름</button></div>
     </div>
-    <div class="legend">가구 드래그: 이동 · 빈 곳 드래그: 시점 회전 · 휠/두 손가락: 확대 · R: 90° 회전</div>
+    <div class="legend">가구 드래그: 이동 · 파란 고리 드래그: 자유 회전 · 빈 곳에 클릭 후 드래그: 시점 회전 · 빈 곳에 우클릭 후 드래그: 평면도 이동 · 휠/두 손가락: 확대 · R: 15° 회전</div>
     <div id="cmpUi" hidden>
       <div class="cmp-label" id="cmpA"></div><div class="cmp-label" id="cmpB"></div>
       <div class="divider" id="cmpDiv"></div>
@@ -191,6 +191,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
       </div>
       <div class="sw" id="sSw"></div>
       <div class="mono" id="sPos"></div>
+      <div class="mono">파란 고리나 점을 끌면 자유롭게 돌아가요 · Shift를 누르고 끌면 15° 단위</div>
     </div>
     <div class="toast" id="toast"></div>
   </section>
@@ -199,7 +200,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795580440';
+const APP_VER='1795580738';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -471,14 +472,21 @@ function setItems(list){items=list.filter(i=>FURN[i.t]).map(norm);syncCtx(main,i
 
 /* 선택 표시 */
 const selBox=new THREE.Box3Helper(new THREE.Box3(),new THREE.Color('#2a5bd7'));main.scene.add(selBox);selBox.visible=false;
-function updSelBox(){const o=main.map.get(selId);if(!o){selBox.visible=false;return}selBox.box.setFromObject(o);selBox.box.expandByScalar(.02);selBox.visible=true;updSelPanel()}
+const RING_C='#2a5bd7',rotRing=new THREE.Group();rotRing.visible=false;main.scene.add(rotRing);let ringR=0,ringMesh,ringHit;
+const knob=new THREE.Mesh(new THREE.SphereGeometry(.11,16,12),new THREE.MeshBasicMaterial({color:RING_C}));rotRing.add(knob);
+function placeRing(it){const R=Math.max(.45,Math.hypot(it.w,it.d)/2+.18);
+  if(Math.abs(R-ringR)>.01){if(ringMesh){rotRing.remove(ringMesh,ringHit);ringMesh.geometry.dispose();ringHit.geometry.dispose()}
+    ringMesh=new THREE.Mesh(new THREE.TorusGeometry(R,.022,8,72),new THREE.MeshBasicMaterial({color:RING_C,transparent:true,opacity:.85}));ringMesh.rotation.x=Math.PI/2;
+    ringHit=new THREE.Mesh(new THREE.TorusGeometry(R,.13,6,48),new THREE.MeshBasicMaterial({visible:false}));ringHit.rotation.x=Math.PI/2;rotRing.add(ringMesh,ringHit);ringR=R}
+  rotRing.position.set(it.x,.06,it.z);const a=it.r*DEG;knob.position.set(Math.sin(a)*R,0,Math.cos(a)*R);rotRing.visible=!compare}
+function updSelBox(){const o=main.map.get(selId);if(!o){selBox.visible=false;rotRing.visible=false;return}selBox.box.setFromObject(o);selBox.box.expandByScalar(.02);selBox.visible=true;placeRing(cur());updSelPanel()}
 function cur(){return items.find(i=>i.id===selId)}
-function select(id){selId=id;const it=cur();$('sel').hidden=!it;if(!it){selBox.visible=false;return}
+function select(id){selId=id;const it=cur();$('sel').hidden=!it;if(!it){selBox.visible=false;rotRing.visible=false;return}
   $('sName').textContent=FURN[it.t].n;$('sW').value=Math.round(it.w*1000);$('sD').value=Math.round(it.d*1000);$('sH').value=Math.round(it.h*1000);
   const sw=$('sSw');sw.textContent='';SWATCH.forEach(c=>{const b=document.createElement('button');b.style.background=c;b.title=c;b.setAttribute('aria-label','색 '+c);b.onclick=()=>{mut(()=>{it.col=c});refreshObj(it)};sw.appendChild(b)});
   const ci=document.createElement('input');ci.type='color';ci.id='sCol';ci.value=it.col;ci.title='직접 고르기';ci.oninput=()=>{it.col=ci.value;refreshObj(it);changed()};ci.onfocus=()=>pushHist();sw.appendChild(ci);
   updSelBox()}
-function updSelPanel(){const it=cur();if(!it)return;$('sPos').textContent=`위치 ${Math.round(it.x*1000)}, ${Math.round(it.z*1000)} mm · 방향 ${((it.r%360)+360)%360}° · ${roomAt(it.x,it.z)}`}
+function updSelPanel(){const it=cur();if(!it)return;$('sPos').textContent=`위치 ${Math.round(it.x*1000)}, ${Math.round(it.z*1000)} mm · 방향 ${Math.round(((it.r%360)+360)%360)}° · ${roomAt(it.x,it.z)}`}
 function roomAt(x,z){for(const r of ROOMS){for(const q of[r.r,...(r.extra||[])]){if(x>=q[0]&&x<=q[2]&&z>=q[1]&&z<=q[3])return r.n}}return '집 밖'}
 
 /* 되돌리기 · 변경 감지 */
@@ -520,13 +528,19 @@ function setNdc(e){const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)
 let drag=null,down=null,activePtr=new Set();
 cv.addEventListener('pointerdown',e=>{activePtr.add(e.pointerId);down={x:e.clientX,y:e.clientY,hit:false};
   if(compare||activePtr.size>1){if(drag){drag=null;controls.enabled=true}return}
-  setNdc(e);const hits=ray.intersectObjects(main.furn.children,true);
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  setNdc(e);
+  if(rotRing.visible&&ringHit){const rh=ray.intersectObjects([knob,ringHit],false);const it=cur();
+    if(rh.length&&it&&ray.ray.intersectPlane(floor,hitP)){down.hit=true;drag={mode:'rot',id:it.id,r0:it.r,a0:Math.atan2(hitP.x-it.x,hitP.z-it.z),moved:false,pid:e.pointerId};controls.enabled=false;try{cv.setPointerCapture(e.pointerId)}catch(_){}return}}
+  const hits=ray.intersectObjects(main.furn.children,true);
   if(hits.length){const root=hits[0].object.userData.root;const it=items.find(i=>i.id===root.userData.id);if(!it)return;
     down.hit=true;if(selId!==it.id)select(it.id);ray.ray.intersectPlane(floor,hitP);
     drag={id:it.id,ox:it.x-hitP.x,oz:it.z-hitP.z,moved:false,pid:e.pointerId};controls.enabled=false;try{cv.setPointerCapture(e.pointerId)}catch(_){}}
 },{capture:true});
 cv.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.pid)return;setNdc(e);if(!ray.ray.intersectPlane(floor,hitP))return;const it=cur();if(!it)return;
   if(!drag.moved){pushHist();drag.moved=true}
+  if(drag.mode==='rot'){let r=drag.r0+(Math.atan2(hitP.x-it.x,hitP.z-it.z)-drag.a0)/DEG;r=e.shiftKey?Math.round(r/15)*15:Math.round(r);it.r=((r%360)+360)%360;
+    main.map.get(it.id).rotation.y=it.r*DEG;updSelBox();return}
   const sn=.05;it.x=Math.round((hitP.x+drag.ox)/sn)*sn;it.z=Math.round((hitP.z+drag.oz)/sn)*sn;
   it.x=Math.max(-2,Math.min(17.6,it.x));it.z=Math.max(-2,Math.min(16,it.z));
   const o=main.map.get(it.id);o.position.set(it.x,0,it.z);updSelBox()});
@@ -568,7 +582,7 @@ $('bLabels').onclick=()=>{showLabels=!showLabels;$('bLabels').setAttribute('aria
 addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();return}
   const it=cur();if(e.key==='Escape'){select(null);return}if(!it)return;
-  if(e.key==='r'||e.key==='R'){rot(e.shiftKey?-15:90);e.preventDefault()}
+  if(e.key==='r'||e.key==='R'){rot(e.shiftKey?15:-15);e.preventDefault()}
   else if(e.key==='Delete'||e.key==='Backspace'){$('sDel').click();e.preventDefault()}
   else if(e.key.startsWith('Arrow')){const s=e.shiftKey?.01:.05;mut(()=>{if(e.key==='ArrowLeft')it.x-=s;if(e.key==='ArrowRight')it.x+=s;if(e.key==='ArrowUp')it.z-=s;if(e.key==='ArrowDown')it.z+=s});main.map.get(it.id).position.set(it.x,0,it.z);updSelBox();e.preventDefault()}});
 
