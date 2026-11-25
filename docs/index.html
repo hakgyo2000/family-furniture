@@ -208,7 +208,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795585714';
+const APP_VER='1795585968';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -340,6 +340,7 @@ const BUILD={
  tower(g,w,d,h,c){const r=Math.min(w,d)/2;C(g,r,r,h-.04,c,0,0,0,32,{roughness:.45});C(g,r*.98,r*.98,.04,shade(c,.75),0,h-.04,0,32);
    for(let k=1;k<=4;k++)C(g,r*1.005,r*1.005,.012,shade(c,.85),0,h*.12+k*h*.11,0,32);C(g,r*.4,r*.4,.006,'#cfe3f4',0,h,0,24,{emissive:'#7fb2e5',emissiveIntensity:.35})},
  shoe(g,w,d,h,c){BUILD.wardrobe(g,w,d,h,c)},
+ partition(g,w,d,h,c){B(g,w,h-.03,d,c,0,.03,0);B(g,w+.02,.03,d+.04,shade(c,.7),0,0,0);B(g,w+.01,.02,d+.01,shade(c,.8),0,h-.02,0)},
  display(g,w,d,h,c){const t=.025;B(g,t,h,d,c,-w/2+t/2,0,0);B(g,t,h,d,c,w/2-t/2,0,0);B(g,w,t,d,c,0,h-t,0);B(g,w,.06,d,c,0,0,0);B(g,w-2*t,h-.06-t,.012,shade(c,1.4),0,.06,-d/2+.006);
    const n=3,ih=(h-.06-t)/n;for(let i=1;i<n;i++)B(g,w-2*t,t,d-.012,'#9a9ea5',0,.06+ih*i-t/2,.006)},
  toilet(g,w,d,h,c){B(g,w*.9,.4,d*.68,c,0,0,d/2-d*.34);B(g,w*.88,.03,d*.62,shade(c,.94),0,.4,d/2-d*.34);B(g,w,h-.36,d*.28,c,0,.36,-d/2+d*.14)},
@@ -392,6 +393,7 @@ const FURN={
  playmat:{n:'놀이매트',c:'아이',w:2.0,d:1.4,h:.04,col:'#f6c9a8',b:'playmat'},
  plant:{n:'화분',c:'기타',w:.45,d:.45,h:1.2,col:'#4f7f4a',b:'plant'},
  lamp:{n:'스탠드 조명',c:'기타',w:.4,d:.4,h:1.6,col:'#efe6d2',b:'lamp'},
+ partition:{n:'칸막이',c:'기타',w:1.2,d:.12,h:1.8,col:'#7a5233',b:'partition'},
  bike:{n:'실내자전거',c:'기타',w:.55,d:1.1,h:1.2,col:'#2f3339',b:'bike'},
  purifier:{n:'공기청정기',c:'기타',w:.32,d:.32,h:.95,col:'#5b8fd6',b:'tower'},
  humid:{n:'가습기',c:'기타',w:.32,d:.32,h:.95,col:'#f4f5f6',b:'tower'},
