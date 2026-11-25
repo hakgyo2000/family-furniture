@@ -153,7 +153,6 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
     <div class="pane" id="pane-p" hidden>
       <div class="row" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
         <button class="btn sm" id="bNewEmpty">빈 집에서 새로</button>
-        <button class="btn sm" id="bNewCur">현재 상태에서 새로</button>
       </div>
       <h3>배치안 목록</h3>
       <div id="plans"></div>
@@ -200,7 +199,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795579833';
+const APP_VER='1795580440';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -297,6 +296,12 @@ const BUILD={
    B(g,.02,.15,.02,'#8e8e8e',-.05,h*.55,d/2+.01);B(g,.02,.15,.02,'#8e8e8e',.05,h*.55,d/2+.01)},
  tv(g,w,d,h,c){const y=.75;B(g,w,h,.05,'#111317',0,y,-d/2+.06,{roughness:.3});B(g,w-.03,h-.03,.003,'#1d2733',0,y+.015,-d/2+.087,{roughness:.2,metalness:.3})},
  rug(g,w,d,h,c){const m=B(g,w,.012,d,c,0,0,0);m.castShadow=false;const i=B(g,w-.24,.014,d-.24,shade(c,1.12),0,0,0);i.castShadow=false},
+ rtable(g,w,d,h,c){const r=Math.min(w,d)/2;C(g,r,r,.04,c,0,h-.04,0,40);C(g,.05,.06,h-.1,shade(c,.7),0,.04,0,16);C(g,r*.45,r*.5,.04,shade(c,.7),0,0,0,32)},
+ tent(g,w,d,h,c){const sh=new THREE.Shape();sh.moveTo(-w/2,0);sh.lineTo(w/2,0);sh.lineTo(0,h);sh.lineTo(-w/2,0);
+   const geo=new THREE.ExtrudeGeometry(sh,{depth:d,bevelEnabled:false});geo.translate(0,0,-d/2);const m=new THREE.Mesh(geo,M(c,{side:THREE.DoubleSide}));m.castShadow=true;m.receiveShadow=true;g.add(m);
+   const ds=new THREE.Shape();ds.moveTo(-w*.22,0);ds.lineTo(w*.22,0);ds.lineTo(0,h*.6);ds.lineTo(-w*.22,0);const door=new THREE.Mesh(new THREE.ShapeGeometry(ds),M(shade(c,.55),{side:THREE.DoubleSide}));door.position.z=d/2+.004;g.add(door);
+   for(const s_ of[-1,1]){const pole=B(g,.03,.03,d+.12,'#c9a46a',0,h-.015,0);}B(g,w-.04,.03,d-.04,shade(c,1.15),0,0,0).castShadow=false;
+   const fl=B(g,.004,.14,.004,'#c9a46a',0,h,-d/2+.05);const flag=new THREE.Mesh(new THREE.PlaneGeometry(.1,.07),M('#f2d15a',{side:THREE.DoubleSide}));flag.position.set(.05,h+.1,-d/2+.05);g.add(flag)},
  playmat(g,w,d,h,c){const cols=['#f6c9a8','#bfe0d0','#c9d6f2','#f3e3a7'];const nx=Math.max(1,Math.round(w/.5)),nz=Math.max(1,Math.round(d/.5));
    for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const m=B(g,w/nx-.005,h,d/nz-.005,cols[(i+j)%4],-w/2+w/nx*(i+.5),0,-d/2+d/nz*(j+.5));m.castShadow=false}},
  table(g,w,d,h,c){B(g,w,.04,d,c,0,h-.04,0);const lc=shade(c,.75);for(const a of[-1,1])for(const b of[-1,1])B(g,.06,h-.04,.06,lc,a*(w/2-.1),0,b*(d/2-.1))},
@@ -319,8 +324,12 @@ const BUILD={
  toybox(g,w,d,h,c){B(g,.03,h,d,c,-w/2+.015,0,0);B(g,.03,h,d,c,w/2-.015,0,0);B(g,w,.03,d,c,0,h-.03,0);B(g,w,.05,d,c,0,0,0);B(g,w,.03,d,c,0,h/2,0);
    const bc=['#f2a65a','#6fb1d6','#f2d15a','#83c48f','#e47c8f','#a58fd9'];const nx=Math.max(1,Math.round(w/.33));for(let j=0;j<2;j++)for(let i=0;i<nx;i++)B(g,(w-.06)/nx-.03,h/2-.1,d-.06,bc[(i+j*nx)%6],-w/2+.03+(w-.06)/nx*(i+.5),.06+j*h/2,.02)},
  piano(g,w,d,h,c){B(g,w,h,d-.25,c,0,0,-.125,{roughness:.25});B(g,w-.1,.06,.27,c,0,.66,d/2-.135,{roughness:.25});B(g,w-.16,.02,.15,'#f5f5f0',0,.72,d/2-.09);B(g,.06,.66,.08,c,-w/2+.08,0,d/2-.06);B(g,.06,.66,.08,c,w/2-.08,0,d/2-.06)},
- aircon(g,w,d,h,c){B(g,w,h,d,c,0,0,0,{roughness:.5});B(g,w-.08,h*.25,.01,'#555b63',0,h*.62,d/2+.004);B(g,w-.1,.05,.01,'#8fb8d8',0,h*.9,d/2+.004,{emissive:'#4a90c8',emissiveIntensity:.3})},
- treadmill(g,w,d,h,c){B(g,w,.18,d,c,0,0,0);B(g,w-.15,.02,d-.4,'#333',0,.18,.1);for(const s of[-1,1])B(g,.05,h-.18,.05,c,s*(w/2-.03),.18,-d/2+.15);B(g,w,.12,.25,c,0,h-.12,-d/2+.12)},
+ bike(g,w,d,h,c){const dk=shade(c,.7);B(g,w,.05,.08,dk,0,0,-d/2+.06);B(g,w,.05,.08,dk,0,0,d/2-.06);B(g,.07,.06,d-.1,c,0,.02,0);
+   const fw=C(g,.24,.24,.06,'#555b63',0,0,0,24,{metalness:.5,roughness:.3});fw.rotation.z=Math.PI/2;fw.position.set(0,.34,d/2-.28);
+   const p1=B(g,.06,.85,.06,c,0,.05,d/2-.2);p1.rotation.x=-.25;const p2=B(g,.06,.62,.06,c,0,.05,-d/2+.3);p2.rotation.x=.18;
+   B(g,.24,.06,.3,'#1d1f23',0,.74,-d/2+.22);B(g,w*.85,.04,.04,dk,0,h-.06,d/2-.08);B(g,.12,.08,.03,'#8fb8d8',0,h-.16,d/2-.1)},
+ tower(g,w,d,h,c){const r=Math.min(w,d)/2;C(g,r,r,h-.04,c,0,0,0,32,{roughness:.45});C(g,r*.98,r*.98,.04,shade(c,.75),0,h-.04,0,32);
+   for(let k=1;k<=4;k++)C(g,r*1.005,r*1.005,.012,shade(c,.85),0,h*.12+k*h*.11,0,32);C(g,r*.4,r*.4,.006,'#cfe3f4',0,h,0,24,{emissive:'#7fb2e5',emissiveIntensity:.35})},
  shoe(g,w,d,h,c){BUILD.wardrobe(g,w,d,h,c)},
  toilet(g,w,d,h,c){B(g,w*.9,.4,d*.68,c,0,0,d/2-d*.34);B(g,w*.88,.03,d*.62,shade(c,.94),0,.4,d/2-d*.34);B(g,w,h-.36,d*.28,c,0,.36,-d/2+d*.14)},
  ksink(g,w,d,h,c){B(g,w,h-.12,d-.02,c,0,.08,-.01);B(g,w-.02,.08,d-.06,shade(c,.5),0,0,-.03);const n=Math.max(1,Math.round(w/.45));for(let i=1;i<n;i++)B(g,.006,h-.2,.006,shade(c,.7),-w/2+w*i/n,.1,d/2-.02);
@@ -349,10 +358,10 @@ const FURN={
  piano:{n:'업라이트 피아노',c:'거실',w:1.5,d:.6,h:1.25,col:'#1b1b1d',b:'piano'},
  dtable4:{n:'식탁 4인',c:'주방·식사',w:1.4,d:.8,h:.74,col:'#e8e4dc',b:'table'},
  dtable6:{n:'식탁 6인',c:'주방·식사',w:1.8,d:.9,h:.74,col:'#e8e4dc',b:'table'},
+ rtable:{n:'원형 식탁',c:'주방·식사',w:1.1,d:1.1,h:.74,col:'#e8e4dc',b:'rtable'},
  chair:{n:'식탁 의자',c:'주방·식사',w:.45,d:.5,h:.85,col:'#c96b3c',b:'chair'},
  ksink:{n:'주방 싱크대',c:'주방·식사',w:1.4,d:.6,h:.9,col:'#c8682b',b:'ksink'},
- fridge:{n:'양문형 냉장고',c:'주방·식사',w:.9,d:.75,h:1.8,col:'#c9ccd0',b:'fridge'},
- kimchi:{n:'김치냉장고',c:'주방·식사',w:.8,d:.65,h:.9,col:'#d8d6d0',b:'fridge'},
+ fridge:{n:'냉장고',c:'주방·식사',w:.9,d:.75,h:1.8,col:'#c9ccd0',b:'fridge'},
  desk:{n:'책상',c:'서재·수납',w:1.2,d:.6,h:.74,col:'#d7cdbd',b:'desk'},
  dchair:{n:'사무용 의자',c:'서재·수납',w:.6,d:.6,h:1.0,col:'#33373d',b:'dchair'},
  shelf:{n:'책장',c:'서재·수납',w:.8,d:.3,h:1.8,col:'#efe9df',b:'shelf'},
@@ -366,29 +375,16 @@ const FURN={
  lsink:{n:'세탁 싱크',c:'욕실·세탁',w:.8,d:.55,h:.85,col:'#eeeeea',b:'lsink'},
  crib:{n:'아기 침대',c:'아이',w:.7,d:1.3,h:.95,col:'#f1e6d6',b:'crib'},
  toybox:{n:'장난감 수납장',c:'아이',w:1.0,d:.35,h:.8,col:'#f4f1ea',b:'toybox'},
+ tent:{n:'아기 텐트',c:'아이',w:1.2,d:1.2,h:1.3,col:'#f3c6c0',b:'tent'},
  playmat:{n:'놀이매트',c:'아이',w:2.0,d:1.4,h:.04,col:'#f6c9a8',b:'playmat'},
  plant:{n:'화분',c:'기타',w:.45,d:.45,h:1.2,col:'#4f7f4a',b:'plant'},
  lamp:{n:'스탠드 조명',c:'기타',w:.4,d:.4,h:1.6,col:'#efe6d2',b:'lamp'},
- aircon:{n:'스탠드 에어컨',c:'기타',w:.45,d:.35,h:1.8,col:'#f4f5f6',b:'aircon'},
- treadmill:{n:'러닝머신',c:'기타',w:.8,d:1.8,h:1.3,col:'#3a3d42',b:'treadmill'},
+ bike:{n:'실내자전거',c:'기타',w:.55,d:1.1,h:1.2,col:'#2f3339',b:'bike'},
+ purifier:{n:'공기청정기',c:'기타',w:.32,d:.32,h:.95,col:'#5b8fd6',b:'tower'},
+ humid:{n:'가습기',c:'기타',w:.32,d:.32,h:.95,col:'#f4f5f6',b:'tower'},
 };
 const SWATCH=['#f2f0ec','#e9e4da','#d7cdbd','#b8a58c','#8b6b55','#4a4440','#2e2b29','#b9bfae','#7f8a99','#2f4d6b','#c96b3c','#9b3b3b'];
 
-/* ───────── 지금 상태(사진 참고) ───────── */
-const CURRENT=[
- {t:'sofaL',x:6.7,z:4.3,r:-90},{t:'rug',x:5.0,z:4.3,r:90},{t:'ctable',x:5.0,z:4.3,r:90,w:1.3,d:.8},
- {t:'tvstand',x:.32,z:4.3,r:90},{t:'tv',x:.17,z:4.3,r:90},
- {t:'dtable6',x:2.6,z:2.8},{t:'chair',x:2.0,z:2.15},{t:'chair',x:2.6,z:2.15},{t:'chair',x:3.2,z:2.15},
- {t:'chair',x:2.0,z:3.45,r:180},{t:'chair',x:2.6,z:3.45,r:180},{t:'chair',x:3.2,z:3.45,r:180},
- {t:'lamp',x:7.25,z:2.5},{t:'plant',x:.5,z:2.1},{t:'shoe',x:3.32,z:8.2,r:-90},
- {t:'bed_q',x:9.85,z:3.2,r:-90},{t:'nightstand',x:10.63,z:2.15,r:-90},{t:'nightstand',x:10.63,z:4.25,r:-90},
- {t:'bed_k',x:13.55,z:2.7,r:-90},{t:'nightstand',x:14.33,z:1.45,r:-90},{t:'nightstand',x:14.33,z:3.95,r:-90},{t:'dresser',x:11.18,z:2.7,r:90},
- {t:'cube',x:6.13,z:8.9,r:90},{t:'desk',x:7.6,z:10.55,r:180},{t:'dchair',x:7.6,z:9.9},
- {t:'bed_q',x:12.35,z:9.65,r:-90,col:'#d9d2c4'},{t:'nightstand',x:13.13,z:8.45,r:-90},{t:'wardrobe',x:12.4,z:7.66},
- {t:'lsink',x:5.2,z:11.4,r:-90},{t:'washer',x:5.15,z:12.15,r:-90},
- {t:'shelf',x:2.7,z:13.9,r:180},
- {t:'plant',x:7.1,z:.45},{t:'arm',x:6.0,z:.85}
-];
 
 /* ───────── 렌더러 · 씬 ───────── */
 const cv=$('cv'),stage=$('stage');
@@ -471,7 +467,7 @@ function syncCtx(ctx,list){ctx.furn.children.slice().forEach(o=>ctx.furn.remove(
 let items=[],selId=null;
 const main=makeCtx();
 function refreshObj(it){const old=main.map.get(it.id);if(old)main.furn.remove(old);const o=makeObj(it);main.furn.add(o);main.map.set(it.id,o);if(it.id===selId)updSelBox()}
-function setItems(list){items=list.map(norm);syncCtx(main,items);select(null)}
+function setItems(list){items=list.filter(i=>FURN[i.t]).map(norm);syncCtx(main,items);select(null)}
 
 /* 선택 표시 */
 const selBox=new THREE.Box3Helper(new THREE.Box3(),new THREE.Color('#2a5bd7'));main.scene.add(selBox);selBox.visible=false;
@@ -589,7 +585,6 @@ let tT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on'
 
 /* ───────── 배치안 저장 · 공유 (Supabase) ───────── */
 let plans=[],conn='wait',curPlan={id:null,author:null};
-const BUILTIN={id:'@current',title:'지금 집 (사진 참고)',author:'기본',items:CURRENT,builtin:true};
 async function api(path,opt){opt=opt||{};const r=await fetch(SB_URL+'/rest/v1/'+path,Object.assign({},opt,{headers:Object.assign({apikey:SB_KEY,'Content-Type':'application/json'},opt.headers||{})}));
   if(!r.ok)throw new Error(r.status+' '+(await r.text()).slice(0,200));const t=await r.text();return t?JSON.parse(t):null}
 const fromRow=r=>({id:r.id,title:r.title,author:r.author,items:Array.isArray(r.items)?r.items:[],updatedAt:Date.parse(r.updated_at)||0});
@@ -610,7 +605,7 @@ setInterval(()=>{if(document.visibilityState==='visible')refresh()},20000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
 const checked=new Set();
 function renderPlans(){const el=$('plans');el.textContent='';
-  [BUILTIN,...plans].forEach(p=>{const box=document.createElement('div');box.className='plan'+(p.id===curPlan.id?' cur':'');
+  plans.forEach(p=>{const box=document.createElement('div');box.className='plan'+(p.id===curPlan.id?' cur':'');
     const t=document.createElement('div');t.className='t';t.textContent=p.title||'이름 없는 배치';
     const tag=s=>{const tg=document.createElement('span');tg.className='tag';tg.textContent=s;tg.style.marginLeft='6px';t.appendChild(tg)};
     if(p.builtin)tag('기준');if(p.id===curPlan.id)tag('편집 중');
@@ -626,7 +621,7 @@ function renderPlans(){const el=$('plans');el.textContent='';
     p.textContent=conn==='off'?'저장소에 연결하지 못했어요. 인터넷 연결을 확인하고 이 탭을 다시 눌러 주세요.':conn==='wait'?'불러오는 중…':'아직 저장된 가족 배치안이 없어요. 위에 배치안 이름과 내 이름을 적고 저장하면 여기에 나타나요.';el.appendChild(p)}
   updCmpBtn()}
 function twoStep(btn,need,label,fn){if(!need){fn();return}if(btn.dataset.armed){fn();return}const old=btn.textContent;btn.dataset.armed=1;btn.textContent=label;setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=old}},3000)}
-function updCmpBtn(){for(const id of[...checked])if(id!==BUILTIN.id&&!plans.some(p=>p.id===id))checked.delete(id);
+function updCmpBtn(){for(const id of[...checked])if(!plans.some(p=>p.id===id))checked.delete(id);
   const b=$('bCompare');b.disabled=!checked.size;b.textContent=checked.size===2?'두 배치안 나란히 비교':checked.size===1?'편집 중인 배치와 비교':'비교할 배치안을 고르세요'}
 function openPlan(p){endCompare();hist=[];edited=false;setItems((p.items||[]).map(i=>Object.assign({},i)));
   curPlan=p.builtin?{id:null,author:null}:{id:p.id,author:p.author};
@@ -652,16 +647,15 @@ async function deletePlan(p){try{await api('plans?id=eq.'+encodeURIComponent(p.i
   if(curPlan.id===p.id){curPlan={id:null,author:null};dirty=true}toast('삭제했어요');await refresh()}
 $('bSave').onclick=()=>save(false);$('bSaveAs').onclick=()=>save(true);
 $('bNewEmpty').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 새로',()=>{endCompare();hist=[];setItems([]);curPlan={id:null,author:null};$('ptitle').value='';dirty=true;edited=true;saveDraft();setStatus();renderPlans();toast('빈 집에서 시작해요')});
-$('bNewCur').onclick=e=>twoStep(e.currentTarget,dirty,'바꾼 내용 버리고 새로',()=>openPlan(BUILTIN));
 $('author').value=ls.get('furn-author')||'';
 $('author').addEventListener('change',()=>{ls.set('furn-author',myName());renderPlans()});
 $('ptitle').addEventListener('input',()=>{if(curPlan.id)changed()});
 
 /* ───────── 비교 ───────── */
-$('bCompare').onclick=()=>{const all=[BUILTIN,...plans];const sel=[...checked].map(id=>all.find(p=>p.id===id)).filter(Boolean);
+$('bCompare').onclick=()=>{const all=plans;const sel=[...checked].map(id=>all.find(p=>p.id===id)).filter(Boolean);
   if(sel.length===1)sel.unshift({title:($('ptitle').value||'편집 중인 배치'),author:$('author').value||'나',items});
   if(sel.length<2)return;startCompare(sel[0],sel[1])};
-function startCompare(A,B){select(null);const a=makeCtx(),b=makeCtx();syncCtx(a,(A.items||[]).map(norm));syncCtx(b,(B.items||[]).map(norm));
+function startCompare(A,B){select(null);const a=makeCtx(),b=makeCtx();syncCtx(a,(A.items||[]).filter(i=>FURN[i.t]).map(norm));syncCtx(b,(B.items||[]).filter(i=>FURN[i.t]).map(norm));
   a.labels.visible=b.labels.visible=showLabels;compare={a,b};
   $('cmpA').textContent=`${A.title||'배치안'} · ${A.author||''}`;$('cmpB').textContent=`${B.title||'배치안'} · ${B.author||''}`;$('cmpUi').hidden=false;
   if(innerWidth<=820){$('side').classList.add('min');$('mobT').textContent='▴'}
@@ -677,9 +671,7 @@ function syncBg(){const c=new THREE.Color(sceneBg());[main,compare&&compare.a,co
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBg);new MutationObserver(syncBg).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
 /* ───────── 시작 ───────── */
-const draft=ls.get('furn-draft');
-if(draft&&Array.isArray(draft.items)&&(draft.edited||draft.planId)){setItems(draft.items.filter(i=>FURN[i.t]));curPlan={id:draft.planId||null,author:draft.owner||null};$('ptitle').value=draft.title||'';dirty=!!draft.dirty;edited=!!draft.edited}
-else{setItems(CURRENT);dirty=true}
+setItems([]);dirty=false;
 renderPlans();setStatus();refresh();
 /* 새 버전 알림: GitHub Pages가 페이지를 10분 정도 캐시해서, 최신 판이 있으면 새로고침을 권해요 */
 function checkVersion(){fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(h=>{const m=h.match(/const APP_VER='(\d+)'/);
