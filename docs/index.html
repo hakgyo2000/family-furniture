@@ -208,7 +208,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795582788';
+const APP_VER='1795582943';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -731,10 +731,16 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBg);new
 setItems([]);dirty=false;
 renderPlans();setStatus();refresh();
 /* 새 버전 알림: GitHub Pages가 페이지를 10분 정도 캐시해서, 최신 판이 있으면 새로고침을 권해요 */
-function checkVersion(){fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(h=>{const m=h.match(/const APP_VER='(\d+)'/);
-  if(m&&m[1]!==APP_VER&&!$('upd')){const b=document.createElement('button');b.id='upd';b.className='btn pri sm';b.textContent='새 버전이 있어요 · 눌러서 새로고침';
-    b.onclick=()=>{saveDraft();location.replace(location.pathname+'?v='+m[1])};$('stext').parentNode.after(b)}}).catch(()=>{})}
-checkVersion();setInterval(()=>{if(document.visibilityState==='visible')checkVersion()},120000);
+function goLatest(v){saveDraft();location.replace(location.pathname+'?v='+v)}
+// 휴대폰·GitHub Pages가 예전 페이지를 캐시해 두는 경우: 아직 아무것도 안 했으면 조용히 최신 판으로 바로 넘어가요
+function checkVersion(auto){fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(h=>{const m=h.match(/const APP_VER='(\d+)'/);
+  if(!m||m[1]===APP_VER)return;
+  if(auto&&!dirty&&!items.length&&!compare&&new URLSearchParams(location.search).get('v')!==m[1]){goLatest(m[1]);return}
+  if(!$('upd')){const b=document.createElement('button');b.id='upd';b.className='btn pri sm';b.textContent='새 버전이 있어요 · 눌러서 새로고침';
+    b.onclick=()=>goLatest(m[1]);$('stext').parentNode.after(b)}}).catch(()=>{})}
+checkVersion(true);setInterval(()=>{if(document.visibilityState==='visible')checkVersion(false)},120000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkVersion(true)});
+addEventListener('pageshow',e=>{if(e.persisted)checkVersion(true)});
 })();
 </script>
 </body></html>
