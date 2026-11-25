@@ -209,7 +209,8 @@ const ROOMS=[
  {id:'terrace',n:'테라스',a:12.6,r:[0,0,7.6,1.7],f:'stone'},
  {id:'living',n:'거실',a:40.8,r:[0,1.7,7.6,7.3],f:'wood',lab:[3.8,4.6]},
  {id:'entry',n:'현관',a:7.9,r:[1.2,7.3,3.6,10.6],f:'entry'},
- {id:'r1',n:'방1',a:14.7,r:[7.6,1.1,10.9,5.6],f:'wood'},
+ {id:'closet',n:'옷장',a:1.9,r:[9.0,4.6,10.9,5.6],f:'wood',small:1},
+ {id:'r1',n:'방1',a:12.8,r:[7.6,1.1,10.9,5.6],f:'wood',lab:[9.25,3.0]},
  {id:'r4',n:'방4',a:18.9,r:[10.9,0.5,14.6,4.8],f:'wood',extra:[[11.6,4.8,12.8,7.3]]},
  {id:'hall',n:'복도',a:6.5,r:[7.6,5.6,11.6,7.3],f:'wood',extra:[[10.9,4.8,11.6,5.6]],small:1},
  {id:'b2',n:'화장실2',a:6.7,r:[12.8,4.8,15.6,7.3],f:'tile'},
@@ -228,7 +229,9 @@ const SEGS=[
  ['h',.5,10.9,14.6,.2,[[11.5,14.0,'win',.5,2.3]]],
  ['h',4.8,10.9,11.6,.12,[]],
  ['h',4.8,12.8,15.6,.12,[]],
- ['h',5.6,7.6,10.9,.12,[[8.0,8.85,'door']]],
+ ['h',5.6,7.6,10.9,.12,[[8.0,8.85,'door'],[9.6,10.35,'door']]],
+ ['h',4.6,9.0,10.9,.1,[]],
+ ['v',9.0,4.6,5.6,.1,[]],
  ['h',7.3,0,3.6,.2,[[2.0,2.85,'door']]],
  ['h',7.3,3.6,15.6,.12,[[3.9,5.5,'open'],[7.7,8.5,'door'],[9.0,9.7,'door'],[10.75,11.5,'door']]],
  ['h',10.6,3.6,5.95,.12,[[4.5,5.3,'door']]],
@@ -314,6 +317,9 @@ const BUILD={
  aircon(g,w,d,h,c){B(g,w,h,d,c,0,0,0,{roughness:.5});B(g,w-.08,h*.25,.01,'#555b63',0,h*.62,d/2+.004);B(g,w-.1,.05,.01,'#8fb8d8',0,h*.9,d/2+.004,{emissive:'#4a90c8',emissiveIntensity:.3})},
  treadmill(g,w,d,h,c){B(g,w,.18,d,c,0,0,0);B(g,w-.15,.02,d-.4,'#333',0,.18,.1);for(const s of[-1,1])B(g,.05,h-.18,.05,c,s*(w/2-.03),.18,-d/2+.15);B(g,w,.12,.25,c,0,h-.12,-d/2+.12)},
  shoe(g,w,d,h,c){BUILD.wardrobe(g,w,d,h,c)},
+ hanger(g,w,d,h,c){for(const s of[-1,1]){B(g,.04,h,.04,c,s*(w/2-.02),0,0);B(g,.04,.03,d,c,s*(w/2-.02),0,0)}B(g,w,.03,.03,c,0,h-.05,0);
+   const cc=['#3b4a5e','#c9b79c','#7a2f2f','#e8e4dc','#55606b','#a3b18a','#2f2f33','#d7a46b'];const n=Math.max(2,Math.floor((w-.1)/.09));
+   for(let i=0;i<n;i++){const ch=.55+((i*7)%4)*.12;B(g,.035,ch,d*.85,cc[i%8],-w/2+.07+(w-.14)*(i+.5)/n,h-.08-ch,0)}},
 };
 const CAT=['전체','침실','거실','주방·식사','서재·수납','욕실·세탁','아이','기타'];
 const FURN={
@@ -344,6 +350,7 @@ const FURN={
  cube:{n:'칸 책장',c:'서재·수납',w:2.0,d:.35,h:1.9,col:'#f2f0ec',b:'cube'},
  cabinet:{n:'수납장',c:'서재·수납',w:.8,d:.4,h:.9,col:'#efe9df',b:'cabinet'},
  shoe:{n:'신발장',c:'서재·수납',w:1.2,d:.35,h:1.1,col:'#e3ddd2',b:'shoe'},
+ hanger:{n:'행거',c:'침실',w:1.2,d:.45,h:1.7,col:'#2b2b2e',b:'hanger'},
  washer:{n:'세탁기',c:'욕실·세탁',w:.6,d:.65,h:.85,col:'#f0f1f2',b:'washer'},
  dryer:{n:'건조기',c:'욕실·세탁',w:.6,d:.65,h:.85,col:'#d5d8dc',b:'washer'},
  lsink:{n:'세탁 싱크',c:'욕실·세탁',w:.8,d:.55,h:.85,col:'#eeeeea',b:'lsink'},
@@ -364,7 +371,7 @@ const CURRENT=[
  {t:'dtable6',x:2.6,z:2.8},{t:'chair',x:2.0,z:2.15},{t:'chair',x:2.6,z:2.15},{t:'chair',x:3.2,z:2.15},
  {t:'chair',x:2.0,z:3.45,r:180},{t:'chair',x:2.6,z:3.45,r:180},{t:'chair',x:3.2,z:3.45,r:180},
  {t:'lamp',x:7.25,z:2.5},{t:'plant',x:.5,z:2.1},{t:'shoe',x:3.32,z:8.2,r:-90},
- {t:'bed_q',x:9.85,z:3.2,r:-90},{t:'nightstand',x:10.63,z:2.15,r:-90},{t:'nightstand',x:10.63,z:4.25,r:-90},{t:'wardrobe',x:9.75,z:5.24,r:180,w:1.6},
+ {t:'bed_q',x:9.85,z:3.2,r:-90},{t:'nightstand',x:10.63,z:2.15,r:-90},{t:'nightstand',x:10.63,z:4.25,r:-90},{t:'hanger',x:9.95,z:4.9,w:1.7},
  {t:'bed_k',x:13.55,z:2.7,r:-90},{t:'nightstand',x:14.33,z:1.45,r:-90},{t:'nightstand',x:14.33,z:3.95,r:-90},{t:'dresser',x:11.18,z:2.7,r:90},
  {t:'cube',x:6.13,z:8.9,r:90},{t:'desk',x:7.6,z:10.55,r:180},{t:'dchair',x:7.6,z:9.9},
  {t:'bed_q',x:12.35,z:9.65,r:-90,col:'#d9d2c4'},{t:'nightstand',x:13.13,z:8.45,r:-90},{t:'wardrobe',x:12.4,z:7.66},
@@ -405,7 +412,7 @@ function buildHouse(ctx){
   const H=wallMode==='full'?2.6:wallMode==='low'?1.0:.05;
   ROOMS.forEach((r,i)=>{[r.r,...(r.extra||[])].forEach(q=>{const[x1,z1,x2,z2]=q;
     const col=r.f==='wood'?shade(FLOOR.wood,1+(i%3)*.03):FLOOR[r.f];
-    const m=B(g,x2-x1,.02,z2-z1,col,(x1+x2)/2,0,(z1+z2)/2,{roughness:r.f==='wood'?.55:.8});m.castShadow=false;
+    const m=B(g,x2-x1,.02,z2-z1,r.id==='closet'?shade(FLOOR.wood,.9):col,(x1+x2)/2,r.id==='closet'?.004:0,(z1+z2)/2,{roughness:r.f==='wood'?.55:.8});m.castShadow=false;
     if(r.f==='tile'||r.f==='stone'||r.f==='entry'){const gr=new THREE.GridHelper(1,1);gr.visible=false}
   })});
   // 타일 줄눈
