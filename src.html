@@ -550,7 +550,9 @@ setView('3d');camera.position.copy(camGoal.p);controls.target.copy(camGoal.t);ca
 const ray=new THREE.Raycaster(),ndc=new THREE.Vector2(),floor=new THREE.Plane(new THREE.Vector3(0,1,0),0),hitP=new THREE.Vector3();
 function setNdc(e){const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera)}
 let drag=null,down=null,activePtr=new Set();
-cv.addEventListener('pointerdown',e=>{activePtr.add(e.pointerId);down={x:e.clientX,y:e.clientY,hit:false};
+// 손가락을 캔버스 밖에서 떼면 cv가 pointerup을 못 받아 id가 남아요 → 창 전체에서 지우고, 첫 손가락이면 비우고 시작
+['pointerup','pointercancel'].forEach(ev=>addEventListener(ev,e=>activePtr.delete(e.pointerId),true));
+cv.addEventListener('pointerdown',e=>{if(e.isPrimary)activePtr.clear();activePtr.add(e.pointerId);down={x:e.clientX,y:e.clientY,hit:false};
   if(compare||activePtr.size>1){if(drag){drag=null;controls.enabled=true}return}
   if(e.pointerType==='mouse'&&e.button!==0)return;
   setNdc(e);
