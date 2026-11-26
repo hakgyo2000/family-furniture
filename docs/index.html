@@ -215,7 +215,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);background:var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-const APP_VER='1795592630';
+const APP_VER='1795665177';
 const SB_URL='https://tmpppcrdbbmtgwvymkjp.supabase.co',SB_KEY='sb_publishable_rsYuf2vdOR_jLI3JXyk8ig_-bc8WoID';
 (function(){
 "use strict";
@@ -488,6 +488,9 @@ function buildHouse(ctx){
   // 문 표시(바닥 문틀)
   for(const[ax,f,a0,a1,t,ops]of SEGS)for(const o of ops)if(o[2]==='door'){const[a,b]=o;const m=ax==='h'?B(g,b-a,.012,t,'#6b4a35',(a+b)/2,0,f):B(g,t,.012,b-a,'#6b4a35',f,0,(a+b)/2);m.castShadow=false}
   // 고정 설비
+  // 방 1~4 창가 창문턱(평상형): 창 있는 벽을 따라 방 폭 전체, 안쪽으로 55cm, 높이 50cm
+  [[7.66,1.2,10.84,1.75],[10.96,.6,14.5,1.15],[6.01,10.25,8.84,10.8],[10.66,10.85,13.3,11.4]].forEach(([x1,z1,x2,z2])=>{
+    const sh=Math.min(.5,H);B(g,x2-x1,sh-.03,z2-z1,'#9fa2a6',(x1+x2)/2,0,(z1+z2)/2);B(g,x2-x1+.02,.03,z2-z1+.02,'#c4c7cb',(x1+x2)/2,sh-.03,(z1+z2)/2,{roughness:.35})});
   B(g,1.5,.04,1.1,'#e6e6e3',9.77,0,10.27);B(g,1.5,Math.min(H,2.0),.02,gm,9.77,.04,9.72).castShadow=false;
 }
 function labelTex(name,area){const c=document.createElement('canvas');c.width=512;c.height=200;const x=c.getContext('2d');
@@ -651,6 +654,7 @@ $('bLock').onclick=()=>{setLock(!locked);toast(locked?'가구를 모두 잠갔�
 $('bLabels').onclick=()=>{showLabels=!showLabels;$('bLabels').setAttribute('aria-pressed',showLabels);[main,compare&&compare.a,compare&&compare.b].filter(Boolean).forEach(c=>c.labels.visible=showLabels)};
 addEventListener('keydown',e=>{if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(locked)return;
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();undo();return}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='c'&&selId&&!(getSelection()+'')){e.preventDefault();$('sDup').click();toast('복제했어요');return}
   const it=cur();if(e.key==='Escape'){select(null);return}if(!it)return;
   if(e.key==='r'||e.key==='R'){rot(e.shiftKey?15:-15);e.preventDefault()}
   else if(e.key==='Delete'||e.key==='Backspace'){$('sDel').click();e.preventDefault()}
